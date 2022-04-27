@@ -3,28 +3,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" type=text/css href="listaaasiakkaat.css"/>
 <meta charset="ISO-8859-1">
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link rel="stylesheet" type=text/css href="listaaasiakkaat.css">
 <title>Insert title here</title>
 <style>
 .oikealle{
 	text-align: right;
 }
-.varit{
-color:lightblue;
-}
 </style>
 </head>
-
 <body>
 	<table id="listaus">
 		<thead>
+		<tr> 
+		<th colspan="5" class="oikealle"><span id="uusiAsiakas">Lisää uusi asiakas</span></th>
+		</tr>
 			<tr>
 				<th class="oikealle">Hakusana:</th>
-				<th colspan="2"><input type="text" id="hakusana"></th>
+				<th colspan="3"><input type="text" id="hakusana"></th>
 				<th><input type="button" value="hae" id="hakunappi"></th>
 			</tr>
 			<tr>
@@ -32,18 +29,29 @@ color:lightblue;
 				<th>Sukuimi</th>
 				<th>Puhelin</th>
 				<th>Sähköposti</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 		</tbody>
 	</table>
-</body>
 <script>
 	$(document).ready(function() {
+		
+		$("#uusiAsiakas").click(function(){
+			document.location="lisaaasiakas.jsp";
+		});
+		
 	haeAsiakas();
 		$("#hakunappi").click(function(){
 			haeAsiakas();
 		});
+		$(document.body).on("keydown", function(event){
+			  if(event.which==13){ //Enteriä painettu, ajetaan haku
+				  haeAsiakkaat();
+			  }
+		});
+		$("#hakusana").focus();//viedään kursori hakusana-kenttään sivun latauksen yhteydessä
 	});
 	
 	function haeAsiakas(){
@@ -58,10 +66,25 @@ color:lightblue;
 					htmlStr += "<td>" + field.sukunimi + "</td>";
 					htmlStr += "<td>" + field.puhelin + "</td>";
 					htmlStr += "<td>" + field.sposti + "</td>";
+					htmlStr+="<td><span class='poista' onclick=poista('"+field.etunimi+"')>Poista</span></td>";
 					htmlStr += "</tr>";
 					$("#listaus tbody").append(htmlStr);
 				});
 			}});
 	}
+	function poista(etunimi){
+		if(confirm("Poista asiakas " + etunimi +"?")){
+			$.ajax({url:"asiakkaat/"+etunimi, type:"DELETE", dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}
+		        if(result.response==0){
+		        	$("#ilmo").html("Asiakkaan poisto epäonnistui.");
+		        }else if(result.response==1){
+		        	$("#rivi_"+etunimi).css("background-color", "red"); //Värjätään poistetun asiakkaan rivi
+		        	alert("Asiakkaan " + etunimi +" poisto onnistui.");
+					haeAsiakkaat();        	
+				}
+		    }});
+		}	
+}
 </script>
+</body>
 </html>

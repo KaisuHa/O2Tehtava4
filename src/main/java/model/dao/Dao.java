@@ -67,7 +67,6 @@ public class Dao {
 					stmtPrep.setString(1, "%" + hakusana + "%");
 					stmtPrep.setString(2, "%" + hakusana + "%");   
 					stmtPrep.setString(3, "%" + hakusana + "%");  
-					stmtPrep.setString(3, "%" + hakusana + "%");
 					rs = stmtPrep.executeQuery(); 
 					if(rs!=null){//jos kysely onnistui
 						//con.close();	
@@ -86,6 +85,39 @@ public class Dao {
 			e.printStackTrace();
 		}		
 		return asiakkaat;
+	}
+	public boolean lisaaAsiakas(Asiakas asiakas){
+		boolean paluuArvo=true;
+		sql="INSERT INTO asiakkaat (etunimi, sukunimi, puhelin, sposti) VALUES(?,?,?,?)";						  
+		try {
+			con = yhdista();
+			stmtPrep=con.prepareStatement(sql); 
+			stmtPrep.setString(1, asiakas.getEtunimi());
+			stmtPrep.setString(2, asiakas.getSukunimi());
+			stmtPrep.setString(3, asiakas.getPuhelin());
+			stmtPrep.setString(4, asiakas.getSposti());
+			stmtPrep.executeUpdate();
+	        con.close();
+		} catch (Exception e) {				
+			e.printStackTrace();
+			paluuArvo=false;
+		}				
+		return paluuArvo;
+	}
+	public boolean poistaAsiakas(String etunimi) {
+		boolean paluuArvo=true;
+		sql="DELETE FROM asiakkaat where etunimi=?";
+		try {
+			con = yhdista();
+			stmtPrep = con.prepareStatement(sql);
+			stmtPrep.setString(1, etunimi);
+			stmtPrep.executeUpdate();
+			con.close();
+		} catch  (Exception e) {
+			e.printStackTrace();
+			paluuArvo = false;
+		}
+		return paluuArvo;
 	}
 	}
 
